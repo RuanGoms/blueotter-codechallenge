@@ -2,7 +2,7 @@ import { Controller, Post, Get, Param, HttpException, HttpStatus } from '@nestjs
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 
-@ApiTags('users')
+@ApiTags('sync', 'users')
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
