@@ -23,7 +23,8 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('sync', 'Sync GitHub repositories to local database')
-    .addTag('repositories', 'Repository management and search')
+    .addTag('users', 'User repository management')
+    .addTag('repositories', 'Repository search')
     .addTag('statistics', 'Repository statistics and analytics')
     .build();
 

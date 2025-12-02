@@ -2,12 +2,12 @@ import { Controller, Post, Get, Param, HttpException, HttpStatus } from '@nestjs
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 
-@ApiTags('sync', 'users')
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('sync/:username')
+  @ApiTags('sync')
   @ApiOperation({ summary: 'Sync user repositories from GitHub' })
   @ApiParam({ name: 'username', description: 'GitHub username' })
   @ApiResponse({
@@ -32,6 +32,7 @@ export class UsersController {
   }
 
   @Get('users/:username/repositories')
+  @ApiTags('users')
   @ApiOperation({ summary: 'Get user repositories from local database' })
   @ApiParam({ name: 'username', description: 'GitHub username' })
   @ApiResponse({
