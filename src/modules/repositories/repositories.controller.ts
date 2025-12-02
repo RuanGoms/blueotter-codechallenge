@@ -1,7 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { RepositoriesService } from './repositories.service';
-import { HttpResponse } from '../../common/utils/http-response.util';
 
 @ApiTags('repositories')
 @Controller('repositories')
@@ -24,9 +23,9 @@ export class RepositoriesController {
 
     switch (result.kind) {
       case 'OK':
-        return HttpResponse.ok(result.data);
+        return result.data;
       default:
-        return HttpResponse.error('Internal Server Error');
+        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

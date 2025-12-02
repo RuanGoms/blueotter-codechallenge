@@ -1,7 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
-import { HttpResponse } from '../../common/utils/http-response.util';
 
 @ApiTags('statistics')
 @Controller('statistics')
@@ -33,11 +32,11 @@ export class StatisticsController {
 
     switch (result.kind) {
       case 'OK':
-        return HttpResponse.ok(result.data);
+        return result.data;
       case 'NotFound':
-        return HttpResponse.notFound('User not found');
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       default:
-        return HttpResponse.error('Internal Server Error');
+        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

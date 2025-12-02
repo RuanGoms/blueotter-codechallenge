@@ -1,7 +1,6 @@
-import { Controller, Post, Get, Param, HttpCode } from '@nestjs/common';
+import { Controller, Post, Get, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { HttpResponse } from '../../common/utils/http-response.util';
 
 @ApiTags('users')
 @Controller()
@@ -22,13 +21,13 @@ export class UsersController {
 
     switch (result.kind) {
       case 'OK':
-        return HttpResponse.ok(result.data);
+        return result.data;
       case 'NotFound':
-        return HttpResponse.notFound('GitHub user not found');
+        throw new HttpException('GitHub user not found', HttpStatus.NOT_FOUND);
       case 'Error':
-        return HttpResponse.error(result.error);
+        throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
       default:
-        return HttpResponse.error('Internal Server Error');
+        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -44,11 +43,11 @@ export class UsersController {
 
     switch (result.kind) {
       case 'OK':
-        return HttpResponse.ok(result.data);
+        return result.data;
       case 'NotFound':
-        return HttpResponse.notFound('User not found');
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       default:
-        return HttpResponse.error('Internal Server Error');
+        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
