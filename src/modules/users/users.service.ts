@@ -23,7 +23,7 @@ export class UsersService {
     const githubUserResponse = await this.githubService.fetchUser(username);
 
     if (githubUserResponse.kind !== 'OK') {
-      return githubUserResponse;
+      return githubUserResponse as ServiceResponse<{ message: string; count: number; }>;
     }
 
     const githubUser = githubUserResponse.data;
@@ -32,7 +32,7 @@ export class UsersService {
     );
 
     if (githubReposResponse.kind !== 'OK') {
-      return githubReposResponse;
+      return githubReposResponse as ServiceResponse<{ message: string; count: number; }>;
     }
 
     const githubRepos = githubReposResponse.data;

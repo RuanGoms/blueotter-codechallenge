@@ -78,8 +78,8 @@ describe('UsersService', () => {
         repositories: [],
       };
 
-      githubService.fetchUser.mockResolvedValue(githubUser);
-      githubService.fetchUserRepositories.mockResolvedValue(githubRepos);
+      githubService.fetchUser.mockResolvedValue({ kind: 'OK', data: githubUser });
+      githubService.fetchUserRepositories.mockResolvedValue({ kind: 'OK', data: githubRepos });
       usersRepository.findOne.mockResolvedValue(null);
       usersRepository.create.mockReturnValue(createdUser as User);
       usersRepository.save.mockResolvedValue(createdUser as User);
@@ -91,8 +91,11 @@ describe('UsersService', () => {
       const result = await service.syncUserRepositories(username);
 
       // Assert
-      expect(result.message).toBe('Successfully synced 1 repositories for user torvalds');
-      expect(result.count).toBe(1);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data.message).toBe('Successfully synced 1 repositories for user torvalds');
+        expect(result.data.count).toBe(1);
+      }
       expect(githubService.fetchUser).toHaveBeenCalledWith(username);
       expect(githubService.fetchUserRepositories).toHaveBeenCalledWith(username);
       expect(usersRepository.findOne).toHaveBeenCalledWith({ where: { id: githubUser.id } });
@@ -130,8 +133,8 @@ describe('UsersService', () => {
         },
       ];
 
-      githubService.fetchUser.mockResolvedValue(githubUser);
-      githubService.fetchUserRepositories.mockResolvedValue(githubRepos);
+      githubService.fetchUser.mockResolvedValue({ kind: 'OK', data: githubUser });
+      githubService.fetchUserRepositories.mockResolvedValue({ kind: 'OK', data: githubRepos });
       usersRepository.findOne.mockResolvedValue(existingUser as User);
       usersRepository.save.mockResolvedValue(existingUser as User);
       repositoriesRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
@@ -142,7 +145,10 @@ describe('UsersService', () => {
       const result = await service.syncUserRepositories(username);
 
       // Assert
-      expect(result.count).toBe(1);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data.count).toBe(1);
+      }
       expect(usersRepository.create).not.toHaveBeenCalled();
       expect(usersRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -162,8 +168,8 @@ describe('UsersService', () => {
         avatar_url: 'https://avatars.githubusercontent.com/u/999999',
       };
 
-      githubService.fetchUser.mockResolvedValue(githubUser);
-      githubService.fetchUserRepositories.mockResolvedValue([]);
+      githubService.fetchUser.mockResolvedValue({ kind: 'OK', data: githubUser });
+      githubService.fetchUserRepositories.mockResolvedValue({ kind: 'OK', data: [] });
       usersRepository.findOne.mockResolvedValue(null);
       usersRepository.create.mockReturnValue({
         id: githubUser.id,
@@ -178,8 +184,11 @@ describe('UsersService', () => {
       const result = await service.syncUserRepositories(username);
 
       // Assert
-      expect(result.count).toBe(0);
-      expect(result.message).toBe('Successfully synced 0 repositories for user emptyuser');
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data.count).toBe(0);
+        expect(result.data.message).toBe('Successfully synced 0 repositories for user emptyuser');
+      }
       expect(repositoriesRepository.save).not.toHaveBeenCalled();
     });
   });
@@ -214,7 +223,10 @@ describe('UsersService', () => {
       const result = await service.getUserRepositories(username);
 
       // Assert
-      expect(result).toEqual(repositories);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data).toEqual(repositories);
+      }
       expect(usersRepository.findOne).toHaveBeenCalledWith({ where: { login: username } });
       expect(repositoriesRepository.find).toHaveBeenCalledWith({
         where: { userId: user.id },
@@ -222,7 +234,7 @@ describe('UsersService', () => {
       });
     });
 
-    it('should return empty array for non-existent user', async () => {
+    it('should return NotFound for non-existent user', async () => {
       // Arrange
       const username = 'nonexistent';
       usersRepository.findOne.mockResolvedValue(null);
@@ -231,7 +243,7 @@ describe('UsersService', () => {
       const result = await service.getUserRepositories(username);
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result.kind).toBe('NotFound');
       expect(usersRepository.findOne).toHaveBeenCalledWith({ where: { login: username } });
       expect(repositoriesRepository.find).not.toHaveBeenCalled();
     });
