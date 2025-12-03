@@ -23,7 +23,10 @@ export class RepositoriesController {
 
     switch (result.kind) {
       case 'OK':
-        return { repositories: result.data };
+        return {
+          success: true,
+          data: { repositories: result.data },
+        };
       default:
         throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
     }

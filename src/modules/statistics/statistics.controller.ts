@@ -33,10 +33,13 @@ export class StatisticsController {
     switch (result.kind) {
       case 'OK':
         return {
-          summary: result.data.summary,
-          languages: result.data.languages,
-          ...(result.data.top_users_by_repos && { top_users_by_repos: result.data.top_users_by_repos }),
-          timeline_created_monthly: result.data.timeline_created_monthly,
+          success: true,
+          data: {
+            summary: result.data.summary,
+            languages: result.data.languages,
+            ...(result.data.top_users_by_repos && { top_users_by_repos: result.data.top_users_by_repos }),
+            timeline_created_monthly: result.data.timeline_created_monthly,
+          },
         };
       case 'NotFound':
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
