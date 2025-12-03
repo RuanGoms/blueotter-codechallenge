@@ -57,11 +57,14 @@ describe('GitHubService', () => {
       const result = await newService.fetchUser(username);
 
       // Assert
-      expect(result).toEqual(expectedUser);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data).toEqual(expectedUser);
+      }
       expect(axiosInstance.get).toHaveBeenCalledWith(`/users/${username}`);
     });
 
-    it('should throw 404 error when user not found', async () => {
+    it('should return NotFound when user not found', async () => {
       // Arrange
       const username = 'nonexistentuser123456';
       const axiosInstance = {
@@ -73,14 +76,15 @@ describe('GitHubService', () => {
 
       const newService = new GitHubService(configService);
 
-      // Act & Assert
-      await expect(newService.fetchUser(username)).rejects.toThrow(
-        new HttpException(`GitHub user '${username}' not found`, HttpStatus.NOT_FOUND),
-      );
+      // Act
+      const result = await newService.fetchUser(username);
+
+      // Assert
+      expect(result.kind).toBe('NotFound');
       expect(axiosInstance.get).toHaveBeenCalledWith(`/users/${username}`);
     });
 
-    it('should throw 503 error when GitHub API is unavailable', async () => {
+    it('should return Error when GitHub API is unavailable', async () => {
       // Arrange
       const username = 'torvalds';
       const axiosInstance = {
@@ -92,10 +96,14 @@ describe('GitHubService', () => {
 
       const newService = new GitHubService(configService);
 
-      // Act & Assert
-      await expect(newService.fetchUser(username)).rejects.toThrow(
-        new HttpException('Failed to fetch user from GitHub API', HttpStatus.SERVICE_UNAVAILABLE),
-      );
+      // Act
+      const result = await newService.fetchUser(username);
+
+      // Assert
+      expect(result.kind).toBe('Error');
+      if (result.kind === 'Error') {
+        expect(result.error).toBe('Failed to fetch user from GitHub API');
+      }
     });
   });
 
@@ -130,7 +138,10 @@ describe('GitHubService', () => {
       const result = await newService.fetchUserRepositories(username);
 
       // Assert
-      expect(result).toEqual(expectedRepos);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data).toEqual(expectedRepos);
+      }
       expect(axiosInstance.get).toHaveBeenCalledWith(`/users/${username}/repos`, {
         params: {
           per_page: 100,
@@ -185,7 +196,10 @@ describe('GitHubService', () => {
       const result = await newService.fetchUserRepositories(username);
 
       // Assert
-      expect(result).toHaveLength(150);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data).toHaveLength(150);
+      }
       expect(axiosInstance.get).toHaveBeenCalledTimes(2);
       expect(axiosInstance.get).toHaveBeenNthCalledWith(1, `/users/${username}/repos`, {
         params: { per_page: 100, page: 1, type: 'public' },
@@ -209,11 +223,14 @@ describe('GitHubService', () => {
       const result = await newService.fetchUserRepositories(username);
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result.kind).toBe('OK');
+      if (result.kind === 'OK') {
+        expect(result.data).toEqual([]);
+      }
       expect(axiosInstance.get).toHaveBeenCalledTimes(1);
     });
 
-    it('should throw 404 error when user not found', async () => {
+    it('should return NotFound when user not found', async () => {
       // Arrange
       const username = 'nonexistentuser123456';
       const axiosInstance = {
@@ -225,10 +242,11 @@ describe('GitHubService', () => {
 
       const newService = new GitHubService(configService);
 
-      // Act & Assert
-      await expect(newService.fetchUserRepositories(username)).rejects.toThrow(
-        new HttpException(`GitHub user '${username}' not found`, HttpStatus.NOT_FOUND),
-      );
+      // Act
+      const result = await newService.fetchUserRepositories(username);
+
+      // Assert
+      expect(result.kind).toBe('NotFound');
     });
 
     it('should throw 503 error when GitHub API fails', async () => {
@@ -243,13 +261,14 @@ describe('GitHubService', () => {
 
       const newService = new GitHubService(configService);
 
-      // Act & Assert
-      await expect(newService.fetchUserRepositories(username)).rejects.toThrow(
-        new HttpException(
-          'Failed to fetch repositories from GitHub API',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        ),
-      );
+      // Act
+      const result = await newService.fetchUserRepositories(username);
+
+      // Assert
+      expect(result.kind).toBe('Error');
+      if (result.kind === 'Error') {
+        expect(result.error).toBe('Failed to fetch repositories from GitHub API');
+      }
     });
   });
 });

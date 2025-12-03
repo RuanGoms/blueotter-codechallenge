@@ -62,7 +62,10 @@ describe('RepositoriesService', () => {
       const result = await service.searchRepositories(keywords);
 
       // Assert
-      expect(result).toEqual(expectedRepos);
+      expect(result.kind).toBe("OK");
+      if (result.kind === "OK") {
+        expect(result.data).toEqual(expectedRepos);
+      }
       expect(repositoriesRepository.createQueryBuilder).toHaveBeenCalledWith('repository');
       expect(queryBuilder.leftJoinAndSelect).toHaveBeenCalledWith('repository.user', 'user');
       expect(queryBuilder.where).toHaveBeenCalledWith('LOWER(repository.name) LIKE LOWER(:search)', {
@@ -82,7 +85,10 @@ describe('RepositoriesService', () => {
       const result = await service.searchRepositories(keywords);
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result.kind).toBe("OK");
+      if (result.kind === "OK") {
+        expect(result.data).toEqual([]);
+      }
       expect(queryBuilder.getMany).toHaveBeenCalled();
     });
 
@@ -107,7 +113,10 @@ describe('RepositoriesService', () => {
       const result = await service.searchRepositories(keywords);
 
       // Assert
-      expect(result).toEqual(expectedRepos);
+      expect(result.kind).toBe("OK");
+      if (result.kind === "OK") {
+        expect(result.data).toEqual(expectedRepos);
+      }
       expect(queryBuilder.where).toHaveBeenCalledWith('LOWER(repository.name) LIKE LOWER(:search)', {
         search: '%TYPESCRIPT%',
       });
@@ -140,7 +149,10 @@ describe('RepositoriesService', () => {
       const result = await service.searchRepositories(keywords);
 
       // Assert
-      expect(result).toEqual(expectedRepos);
+      expect(result.kind).toBe("OK");
+      if (result.kind === "OK") {
+        expect(result.data).toEqual(expectedRepos);
+      }
       expect(queryBuilder.orWhere).toHaveBeenCalledWith('LOWER(user.login) LIKE LOWER(:search)', {
         search: '%torvalds%',
       });
@@ -155,7 +167,10 @@ describe('RepositoriesService', () => {
       const result = await service.searchRepositories(keywords);
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result.kind).toBe("OK");
+      if (result.kind === "OK") {
+        expect(result.data).toEqual([]);
+      }
       expect(queryBuilder.where).toHaveBeenCalledWith('LOWER(repository.name) LIKE LOWER(:search)', {
         search: '%test-api%',
       });
