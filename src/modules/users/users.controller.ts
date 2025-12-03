@@ -21,7 +21,10 @@ export class UsersController {
 
     switch (result.kind) {
       case 'OK':
-        return result.data;
+        return {
+          message: result.data.message,
+          count: result.data.count,
+        };
       case 'NotFound':
         throw new HttpException('GitHub user not found', HttpStatus.NOT_FOUND);
       case 'Error':
@@ -44,7 +47,7 @@ export class UsersController {
 
     switch (result.kind) {
       case 'OK':
-        return result.data;
+        return { repositories: result.data };
       case 'NotFound':
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       default:
